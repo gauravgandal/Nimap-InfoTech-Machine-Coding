@@ -1,20 +1,26 @@
+// src/pages/SearchMoviePage.jsx
+
 import React, { useEffect, useState } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { searchMovies } from "../api/api";
 import MovieCard from "../components/MovieCard";
+import Pagination from "../components/Pagination";
 import { FaSadTear } from "react-icons/fa";
 
 function SearchMoviePage() {
   const { query } = useParams();
   const [movies, setMovies] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const results = await searchMovies(query);
-      setMovies(results);
+      const data = await searchMovies(query, currentPage);
+      setMovies(data.results);
+      setTotalPages(data.total_pages);
     };
     fetchMovies();
-  }, [query]);
+  }, [query, currentPage]);
 
   return (
     <div className="bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -23,17 +29,24 @@ function SearchMoviePage() {
       </h1>
       <div className="w-full">
         {movies.length > 0 ? (
-          movies.length === 1 ? (
-            <div className="flex justify-center">
-              <MovieCard movie={movies[0]} />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
-            </div>
-          )
+          <>
+            {movies.length === 1 ? (
+              <div className="flex justify-center">
+                <MovieCard movie={movies[0]} />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {movies.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie} />
+                ))}
+              </div>
+            )}
+            <Pagination
+              page={currentPage}
+              setPage={setCurrentPage}
+              totalPages={totalPages}
+            />
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-150px)] text-center">
             <FaSadTear className="text-9xl text-yellow-500 animate-bounce mb-6" />

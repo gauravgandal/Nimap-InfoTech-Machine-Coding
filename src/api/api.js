@@ -65,18 +65,6 @@ export const getUpcomingMovies = async () => {
   return { results: allMovies, total_pages: totalPages };
 };
 
-export const getMovieVideos = async (id) => {
-  try {
-    const response = await fetch(
-      `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}&language=en-US`
-    );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch movie videos:", error);
-  }
-};
-
 export const getMovieDetails = async (movieId) => {
   try {
     const response = await fetch(
@@ -101,12 +89,17 @@ export const getMovieCast = async (movieId) => {
   }
 };
 
-export const searchMovies = async (query) => {
-  const response = await fetch(
-    `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}`
-  );
-  const data = await response.json();
-  return data.results;
+export const searchMovies = async (query, page = 1) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}&page=${page}`
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching movies:", error);
+    return { results: [], total_pages: 1 };
+  }
 };
 
 export const fetchSuggestions = async (query) => {
